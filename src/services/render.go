@@ -1,7 +1,7 @@
 package services
 
 type Render struct {
-	platoform string
-	name      string
-	server    string
+	platform string
+	name     string
+	server   string
 }
