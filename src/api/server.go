@@ -11,5 +11,9 @@ func InitServer(db storages.Storage) {
 	e := echo.New()
 
 	e.GET("/healthcheck", handlers.Healthcheck(db))
+
+	// Template
+	e.POST("/template", handlers.PostTemplate(db))
+
 	e.Logger.Fatal(e.Start(":1323"))
 }
