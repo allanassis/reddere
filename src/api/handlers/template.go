@@ -27,3 +27,17 @@ func PostTemplate(storage storages.Storage) func(c echo.Context) error {
 		return c.JSON(http.StatusCreated, template)
 	}
 }
+
+func GetTemplate(storage storages.Storage) func(c echo.Context) error {
+	return func(c echo.Context) error {
+		template := new(services.Template)
+
+		templateId := c.Param("id")
+		err := template.Build(templateId, storage)
+		if err != nil {
+			panic(err)
+		}
+
+		return c.JSON(http.StatusOK, template)
+	}
+}
