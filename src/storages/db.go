@@ -1,6 +1,7 @@
 package storages
 
 import (
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -18,7 +19,9 @@ type Database struct {
 type Storage interface {
 	Connect() error
 	Healthcheck() error
+	Bind(result *mongo.SingleResult, instance interface{}) error
 	Save(document interface{}, collectionName string) (string, error)
+	Get(id string, collectionName string) (*mongo.SingleResult, error)
 }
 
 func (db *Database) Save(document interface{}, collectionName string) (string, error) {
@@ -36,6 +39,27 @@ func (db *Database) Save(document interface{}, collectionName string) (string, e
 
 	return stringObjectID, nil
 
+}
+
+func (db *Database) Get(id string, collectionName string) (*mongo.SingleResult, error) {
+	collection := db.client.Database("reddere").Collection(collectionName)
+
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		panic(err)
+	}
+
+	result := collection.FindOne(context.Background(), bson.D{primitive.E{Key: "_id", Value: objectId}})
+
+	return result, nil
+}
+
+func (db *Database) Bind(result *mongo.SingleResult, instance interface{}) error {
+	err := result.Decode(instance)
+	if err != nil {
+		panic(err)
+	}
+	return nil
 }
 
 func (db *Database) Connect() error {
