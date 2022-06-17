@@ -1,6 +1,10 @@
 package services
 
-import "github.com/allanassis/reddere/src/storages"
+import (
+	"fmt"
+
+	"github.com/allanassis/reddere/src/storages"
+)
 
 type Template struct {
 	ID   string `json:"_id,omitempty" bson:"_id,omitempty"`
@@ -13,6 +17,16 @@ func (template *Template) Save(storage storages.Storage) (string, error) {
 	if err != nil {
 		panic(err)
 	}
-	print("Document inserted with id %s", id)
+	fmt.Printf("Document inserted with id %s\n", id)
 	return id, nil
+}
+
+func (template *Template) Build(templateId string, storage storages.Storage) error {
+	result, err := storage.Get(templateId, "template")
+	if err != nil {
+		panic(err)
+	}
+	storage.Bind(result, template)
+	fmt.Printf("Document retrieved %+v\n", template)
+	return nil
 }
