@@ -1,6 +1,7 @@
 package storages
 
 import (
+	"github.com/allanassis/reddere/src/config"
 	"github.com/allanassis/reddere/src/observability"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -102,9 +103,9 @@ func (db *Database) Healthcheck() error {
 	return nil
 }
 
-func NewDatabase(logger *observability.Logger) Storage {
+func NewDatabase(logger *observability.Logger, config *config.Config) Storage {
 	db := &Database{
-		uri:    "mongodb://localhost:27017",
+		uri:    config.GetString("database.uri"),
 		logger: logger,
 	}
 	return db
