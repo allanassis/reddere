@@ -20,6 +20,8 @@ require (
 	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d // indirect
 	go.mongodb.org/mongo-driver v1.9.1 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
+	go.uber.org/dig v1.14.0 // indirect
+	go.uber.org/fx v1.17.1 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5 // indirect

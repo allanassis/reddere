@@ -102,9 +102,9 @@ func (db *Database) Healthcheck() error {
 	return nil
 }
 
-func NewDatabase(uri string, logger *observability.Logger) Storage {
+func NewDatabase(logger *observability.Logger) Storage {
 	db := &Database{
-		uri:    uri,
+		uri:    "mongodb://localhost:27017",
 		logger: logger,
 	}
 	return db
