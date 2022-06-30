@@ -3,11 +3,12 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/allanassis/reddere/src/observability"
 	"github.com/allanassis/reddere/src/storages"
 	"github.com/labstack/echo/v4"
 )
 
-func Healthcheck(db storages.Storage) func(c echo.Context) error {
+func Healthcheck(db storages.Storage, logger *observability.Logger) func(c echo.Context) error {
 	return func(c echo.Context) error {
 		err := db.Healthcheck()
 		if err != nil {
