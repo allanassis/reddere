@@ -12,9 +12,8 @@ func Healthcheck(db storages.Storage, logger *observability.Logger) func(c echo.
 	return func(c echo.Context) error {
 		err := db.Healthcheck()
 		if err != nil {
-			panic(err)
+			return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
 		}
-
 		return c.JSON(http.StatusOK, map[string]string{"message": "Working"})
 	}
 }
