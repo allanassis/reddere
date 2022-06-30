@@ -21,6 +21,7 @@ func InitServer(db storages.Storage, logger *observability.Logger) {
 	// Template
 	e.POST("/template", handlers.PostTemplate(db, logger))
 	e.GET("/template/:id", handlers.GetTemplate(db, logger))
+	e.DELETE("/template/:id", handlers.DeleteTemplate(db, logger))
 
 	e.Logger.Fatal(e.Start(":1323"))
 }

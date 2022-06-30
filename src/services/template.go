@@ -30,3 +30,12 @@ func (template *Template) Build(templateId string, storage storages.Storage) err
 	fmt.Printf("Document retrieved %+v\n", template)
 	return nil
 }
+
+func (template *Template) Delete(storage storages.Storage) error {
+	_, err := storage.Delete(template.ID, "template")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Document Deleted %+v\n", template.ID)
+	return nil
+}

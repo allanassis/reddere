@@ -42,3 +42,20 @@ func GetTemplate(storage storages.Storage, logger *observability.Logger) func(c 
 		return c.JSON(http.StatusOK, template)
 	}
 }
+
+func DeleteTemplate(storage storages.Storage, logger *observability.Logger) func(c echo.Context) error {
+	return func(c echo.Context) error {
+		templateId := c.Param("id")
+
+		template := services.Template{
+			ID: templateId,
+		}
+
+		err := template.Delete(storage)
+		if err != nil {
+			panic(err)
+		}
+
+		return c.JSON(http.StatusOK, template.ID)
+	}
+}

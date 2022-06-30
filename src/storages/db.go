@@ -24,6 +24,7 @@ type Storage interface {
 	Bind(result *mongo.SingleResult, instance interface{}) error
 	Save(document interface{}, collectionName string) (string, error)
 	Get(id string, collectionName string) (*mongo.SingleResult, error)
+	Delete(id string, collectionName string) (*mongo.DeleteResult, error)
 }
 
 func (db *Database) Save(document interface{}, collectionName string) (string, error) {
@@ -52,6 +53,22 @@ func (db *Database) Get(id string, collectionName string) (*mongo.SingleResult, 
 	}
 
 	result := collection.FindOne(context.Background(), bson.D{primitive.E{Key: "_id", Value: objectId}})
+
+	return result, nil
+}
+
+func (db *Database) Delete(id string, collectionName string) (*mongo.DeleteResult, error) {
+	collection := db.client.Database("reddere").Collection(collectionName)
+
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		panic(err)
+	}
+
+	result, err := collection.DeleteOne(context.Background(), bson.D{primitive.E{Key: "_id", Value: objectId}})
+	if err != nil {
+		return nil, err
+	}
 
 	return result, nil
 }
