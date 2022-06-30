@@ -3,13 +3,13 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/allanassis/reddere/src/observability"
+	"github.com/allanassis/reddere/src/observability/logging"
 	"github.com/allanassis/reddere/src/services"
 	"github.com/allanassis/reddere/src/storages"
 	"github.com/labstack/echo/v4"
 )
 
-func PostTemplate(storage storages.Storage, logger *observability.Logger) func(c echo.Context) error {
+func PostTemplate(storage storages.Storage, logger *logging.Logger) func(c echo.Context) error {
 	return func(c echo.Context) error {
 		template := new(services.Template)
 
@@ -29,7 +29,7 @@ func PostTemplate(storage storages.Storage, logger *observability.Logger) func(c
 	}
 }
 
-func GetTemplate(storage storages.Storage, logger *observability.Logger) func(c echo.Context) error {
+func GetTemplate(storage storages.Storage, logger *logging.Logger) func(c echo.Context) error {
 	return func(c echo.Context) error {
 		template := new(services.Template)
 
@@ -43,7 +43,7 @@ func GetTemplate(storage storages.Storage, logger *observability.Logger) func(c 
 	}
 }
 
-func DeleteTemplate(storage storages.Storage, logger *observability.Logger) func(c echo.Context) error {
+func DeleteTemplate(storage storages.Storage, logger *logging.Logger) func(c echo.Context) error {
 	return func(c echo.Context) error {
 		templateId := c.Param("id")
 

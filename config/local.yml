@@ -1,2 +1,5 @@
 database:
   uri: mongodb://localhost:27017
+observability:
+  logging:
+    level: info

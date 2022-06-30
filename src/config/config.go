@@ -1,19 +1,26 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"fmt"
+	"os"
+
+	"github.com/spf13/viper"
+)
 
 type Config struct {
 	viper.Viper
 }
 
 func NewConfig() *Config {
-
-	// Instancia a struct Vyper
+	env, hasEnv := os.LookupEnv("ENV")
+	if !hasEnv {
+		panic("Please set the ENV variable")
+	}
 	config := viper.New()
 
 	config.AddConfigPath("./config")
 	config.SetConfigType("yml")
-	config.SetConfigName("local.yml") // TODO: Change by env
+	config.SetConfigName(fmt.Sprintf("%s.yml", env))
 	config.SetEnvPrefix("PREFIX")
 	config.ReadInConfig()
 	config.AutomaticEnv()

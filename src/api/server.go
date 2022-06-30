@@ -2,14 +2,14 @@ package api
 
 import (
 	"github.com/allanassis/reddere/src/api/handlers"
-	"github.com/allanassis/reddere/src/observability"
+	"github.com/allanassis/reddere/src/observability/logging"
 	"github.com/allanassis/reddere/src/storages"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func InitServer(db storages.Storage, logger *observability.Logger) {
+func InitServer(db storages.Storage, logger *logging.Logger) {
 	e := echo.New()
 
 	// Middleware

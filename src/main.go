@@ -7,12 +7,12 @@ import (
 
 	"github.com/allanassis/reddere/src/api"
 	"github.com/allanassis/reddere/src/config"
-	"github.com/allanassis/reddere/src/observability"
+	"github.com/allanassis/reddere/src/observability/logging"
 	"github.com/allanassis/reddere/src/storages"
 	"go.uber.org/fx"
 )
 
-func Register(db storages.Storage, logger *observability.Logger) {
+func Register(db storages.Storage, logger *logging.Logger) {
 	err := db.Connect()
 	if err != nil {
 		panic(err)
@@ -24,7 +24,7 @@ func main() {
 	app := fx.New(
 		fx.Provide(
 			config.NewConfig,
-			observability.Default,
+			logging.NewLogger,
 			storages.NewDatabase,
 		),
 		fx.Invoke(Register),
