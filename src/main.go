@@ -10,7 +10,11 @@ func main() {
 	logger := observability.Default()
 
 	db := storages.NewDatabase("mongodb://localhost:27017", logger)
-	db.Connect()
+	err := db.Connect()
+	if err != nil {
+		panic(err)
+	}
+
 	api.InitServer(db, logger)
 
 }
