@@ -1,4 +1,4 @@
-package services
+package entities
 
 type Render struct {
 	platform string

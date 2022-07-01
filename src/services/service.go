@@ -4,12 +4,13 @@ import (
 	"fmt"
 
 	"github.com/allanassis/reddere/src/observability/logging"
+	"github.com/allanassis/reddere/src/services/entities"
 	"github.com/allanassis/reddere/src/storages"
 )
 
 type Service interface {
-	Save(entity interface{}, entityName string) (string, error)
-	Build(entity interface{}, entityID string, entityName string) error
+	Save(entity entities.Entity) (string, error)
+	Build(entity entities.Entity, entityID string) error
 	Delete(entityID string) error
 }
 
@@ -18,8 +19,8 @@ type BaseService struct {
 	logger  *logging.Logger
 }
 
-func (service *BaseService) Save(entity interface{}, entityName string) (string, error) {
-	id, err := service.storage.Save(entity, entityName)
+func (service *BaseService) Save(entity entities.Entity) (string, error) {
+	id, err := service.storage.Save(entity, entity.EntityName())
 	if err != nil {
 		panic(err)
 	}
@@ -27,8 +28,8 @@ func (service *BaseService) Save(entity interface{}, entityName string) (string,
 	return id, nil
 }
 
-func (service *BaseService) Build(entity interface{}, entityID string, entityName string) error {
-	result, err := service.storage.Get(entityID, entityName)
+func (service *BaseService) Build(entity entities.Entity, entityID string) error {
+	result, err := service.storage.Get(entityID, entity.EntityName())
 	if err != nil {
 		panic(err)
 	}
