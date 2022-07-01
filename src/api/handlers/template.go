@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func PostTemplate(storage storages.Storage, logger *logging.Logger) func(c echo.Context) error {
+func PostTemplate(service services.Service, storage storages.Storage, logger *logging.Logger) func(c echo.Context) error {
 	return func(c echo.Context) error {
 		template := new(services.Template)
 
@@ -18,7 +18,7 @@ func PostTemplate(storage storages.Storage, logger *logging.Logger) func(c echo.
 			panic(err)
 		}
 
-		id, err := template.Save(storage)
+		id, err := service.Save(template, "template")
 		if err != nil {
 			panic(err)
 		}
@@ -29,12 +29,12 @@ func PostTemplate(storage storages.Storage, logger *logging.Logger) func(c echo.
 	}
 }
 
-func GetTemplate(storage storages.Storage, logger *logging.Logger) func(c echo.Context) error {
+func GetTemplate(service services.Service, storage storages.Storage, logger *logging.Logger) func(c echo.Context) error {
 	return func(c echo.Context) error {
 		template := new(services.Template)
 
 		templateId := c.Param("id")
-		err := template.Build(templateId, storage)
+		err := service.Build(template, templateId, "template")
 		if err != nil {
 			panic(err)
 		}
@@ -43,19 +43,15 @@ func GetTemplate(storage storages.Storage, logger *logging.Logger) func(c echo.C
 	}
 }
 
-func DeleteTemplate(storage storages.Storage, logger *logging.Logger) func(c echo.Context) error {
+func DeleteTemplate(service services.Service, storage storages.Storage, logger *logging.Logger) func(c echo.Context) error {
 	return func(c echo.Context) error {
 		templateId := c.Param("id")
 
-		template := services.Template{
-			ID: templateId,
-		}
-
-		err := template.Delete(storage)
+		err := service.Delete(templateId)
 		if err != nil {
 			panic(err)
 		}
 
-		return c.JSON(http.StatusOK, template.ID)
+		return c.JSON(http.StatusOK, templateId)
 	}
 }
