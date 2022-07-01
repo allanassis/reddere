@@ -18,14 +18,6 @@ type Database struct {
 	logger *logging.Logger
 }
 
-type Storage interface {
-	Healthcheck() error
-	Bind(result *mongo.SingleResult, instance interface{}) error
-	Save(document interface{}, collectionName string) (string, error)
-	Get(id string, collectionName string) (*mongo.SingleResult, error)
-	Delete(id string, collectionName string) (*mongo.DeleteResult, error)
-}
-
 func NewDatabase(logger *logging.Logger, config *config.Config) Storage {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
