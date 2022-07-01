@@ -10,41 +10,45 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 
 	"context"
-	"time"
 )
 
 type Database struct {
-	client mongo.Client
-	logger *logging.Logger
+	client   mongo.Client
+	instance *mongo.Database
+	logger   *logging.Logger
 }
 
 func NewDatabase(logger *logging.Logger, config *config.Config) Storage {
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	uri := config.GetString("database.uri")
+	name := config.GetString("database.name")
+	timeout := config.GetDuration("database.timeout")
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	dbUri := config.GetString("database.uri")
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbUri))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
 	if err != nil {
+		// Implement with retry
 		panic(err)
 	}
 
+	instance := client.Database(name)
+
 	db := &Database{
-		client: *client,
-		logger: logger,
+		client:   *client,
+		instance: instance,
+		logger:   logger,
 	}
 
 	return db
 }
 
 func (db *Database) Save(document interface{}, collectionName string) (string, error) {
-	collection := db.client.Database("reddere").Collection(collectionName)
+	collection := db.instance.Collection(collectionName)
 
-	ctxInsert, cancel := context.WithTimeout(context.Background(), time.Minute)
-	defer cancel()
-
-	insertedResult, err := collection.InsertOne(ctxInsert, document)
+	insertedResult, err := collection.InsertOne(context.Background(), document)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	stringObjectID := insertedResult.InsertedID.(primitive.ObjectID).Hex()
@@ -54,11 +58,11 @@ func (db *Database) Save(document interface{}, collectionName string) (string, e
 }
 
 func (db *Database) Get(id string, collectionName string) (*mongo.SingleResult, error) {
-	collection := db.client.Database("reddere").Collection(collectionName)
+	collection := db.instance.Collection(collectionName)
 
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	result := collection.FindOne(context.Background(), bson.D{primitive.E{Key: "_id", Value: objectId}})
@@ -67,7 +71,7 @@ func (db *Database) Get(id string, collectionName string) (*mongo.SingleResult, 
 }
 
 func (db *Database) Delete(id string, collectionName string) (*mongo.DeleteResult, error) {
-	collection := db.client.Database("reddere").Collection(collectionName)
+	collection := db.instance.Collection(collectionName)
 
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
