@@ -15,12 +15,10 @@ import (
 
 type Database struct {
 	client mongo.Client
-	uri    string
 	logger *logging.Logger
 }
 
 type Storage interface {
-	Connect() error
 	Healthcheck() error
 	Bind(result *mongo.SingleResult, instance interface{}) error
 	Save(document interface{}, collectionName string) (string, error)
@@ -82,19 +80,6 @@ func (db *Database) Bind(result *mongo.SingleResult, instance interface{}) error
 	return nil
 }
 
-func (db *Database) Connect() error {
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-	defer cancel()
-
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(db.uri))
-	if err != nil {
-		return err
-	}
-
-	db.client = *client
-	return nil
-}
-
 func (db *Database) Healthcheck() error {
 	err := db.client.Ping(context.Background(), &readpref.ReadPref{})
 	if err != nil {
@@ -104,9 +89,19 @@ func (db *Database) Healthcheck() error {
 }
 
 func NewDatabase(logger *logging.Logger, config *config.Config) Storage {
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+
+	dbUri := config.GetString("database.uri")
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbUri))
+	if err != nil {
+		panic(err)
+	}
+
 	db := &Database{
-		uri:    config.GetString("database.uri"),
+		client: *client,
 		logger: logger,
 	}
+
 	return db
 }

@@ -13,14 +13,6 @@ import (
 	"go.uber.org/fx"
 )
 
-func Register(service services.Service, db storages.Storage, logger *logging.Logger) {
-	err := db.Connect()
-	if err != nil {
-		panic(err)
-	}
-	api.InitServer(service, db, logger)
-}
-
 func main() {
 	app := fx.New(
 		fx.Provide(
@@ -29,7 +21,7 @@ func main() {
 			logging.NewLogger,
 			storages.NewDatabase,
 		),
-		fx.Invoke(Register),
+		fx.Invoke(api.NewServer),
 	)
 
 	startCtx, cancel := context.WithTimeout(context.Background(), 15*time.Second)

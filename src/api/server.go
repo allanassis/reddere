@@ -10,7 +10,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func InitServer(service services.Service, db storages.Storage, logger *logging.Logger) {
+func NewServer(service services.Service, db storages.Storage, logger *logging.Logger) {
 	e := echo.New()
 
 	// Middleware
