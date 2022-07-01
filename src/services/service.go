@@ -19,6 +19,13 @@ type BaseService struct {
 	logger  *logging.Logger
 }
 
+func NewService(storage storages.Storage, logger *logging.Logger) Service {
+	return &BaseService{
+		storage: storage,
+		logger:  logger,
+	}
+}
+
 func (service *BaseService) Save(entity entities.Entity) (string, error) {
 	id, err := service.storage.Save(entity, entity.EntityName())
 	if err != nil {
@@ -50,10 +57,3 @@ func (service *BaseService) Delete(entityID string) error {
 // type ServiceResult interface {
 
 // }
-
-func NewService(storage storages.Storage, logger *logging.Logger) Service {
-	return &BaseService{
-		storage: storage,
-		logger:  logger,
-	}
-}

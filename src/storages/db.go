@@ -26,6 +26,24 @@ type Storage interface {
 	Delete(id string, collectionName string) (*mongo.DeleteResult, error)
 }
 
+func NewDatabase(logger *logging.Logger, config *config.Config) Storage {
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+
+	dbUri := config.GetString("database.uri")
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbUri))
+	if err != nil {
+		panic(err)
+	}
+
+	db := &Database{
+		client: *client,
+		logger: logger,
+	}
+
+	return db
+}
+
 func (db *Database) Save(document interface{}, collectionName string) (string, error) {
 	collection := db.client.Database("reddere").Collection(collectionName)
 
@@ -86,22 +104,4 @@ func (db *Database) Healthcheck() error {
 		return err
 	}
 	return nil
-}
-
-func NewDatabase(logger *logging.Logger, config *config.Config) Storage {
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-	defer cancel()
-
-	dbUri := config.GetString("database.uri")
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbUri))
-	if err != nil {
-		panic(err)
-	}
-
-	db := &Database{
-		client: *client,
-		logger: logger,
-	}
-
-	return db
 }
