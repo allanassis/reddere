@@ -28,7 +28,10 @@ func NewDatabase(logger *logging.Logger, config *config.Config) Storage {
 
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
 	if err != nil {
-		// Implement with retry
+		logger.Fatal("Panic when connecting to database",
+			logging.String("name", name),
+			logging.String("timeout", timeout.String()),
+			logging.String("uri", uri))
 		panic(err)
 	}
 
