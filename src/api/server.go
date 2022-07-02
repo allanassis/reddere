@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/allanassis/reddere/src/api/handlers"
+	"github.com/allanassis/reddere/src/api/middlewares"
 	"github.com/allanassis/reddere/src/observability/logging"
 	"github.com/allanassis/reddere/src/services"
 	"github.com/allanassis/reddere/src/storages"
@@ -14,7 +15,7 @@ func NewServer(service services.Service, db storages.Storage, logger *logging.Lo
 	e := echo.New()
 
 	// Middleware
-	e.Use(middleware.Logger())
+	e.Use(middlewares.Logger(logger))
 	e.Use(middleware.Recover())
 
 	e.GET("/healthcheck", handlers.Healthcheck(db, logger))
