@@ -12,10 +12,12 @@ import (
 type Field = zap.Field
 
 var (
-	Bool   = zap.Bool
-	String = zap.String
-	Int    = zap.Int
-	Any    = zap.Any
+	Bool     = zap.Bool
+	String   = zap.String
+	Duration = zap.Duration
+	Int      = zap.Int
+	Int64    = zap.Int64
+	Any      = zap.Any
 )
 
 type Logger struct {
@@ -28,16 +30,26 @@ func NewLogger(config *config.Config) *Logger {
 	writer := getWriter()
 
 	cfg := zap.NewProductionConfig()
+	cfg.EncoderConfig.TimeKey = "time"
+	cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+
 	core := zapcore.NewCore(
 		zapcore.NewJSONEncoder(cfg.EncoderConfig),
 		zapcore.AddSync(writer),
 		zapcore.Level(level),
 	)
+
+	zapLogger := zap.New(core)
+
 	logger := &Logger{
-		l:     zap.New(core),
+		l:     zapLogger,
 		level: level,
 	}
 	return logger
+}
+
+func (l *Logger) With(fields ...Field) {
+	l.l = l.l.With(fields...)
 }
 
 func (l *Logger) Debug(msg string, fields ...Field) {
