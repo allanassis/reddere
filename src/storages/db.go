@@ -1,6 +1,8 @@
 package storages
 
 import (
+	"time"
+
 	"github.com/allanassis/reddere/src/config"
 	"github.com/allanassis/reddere/src/observability/logging"
 	"go.mongodb.org/mongo-driver/bson"
@@ -16,22 +18,19 @@ type Database struct {
 	client   mongo.Client
 	instance *mongo.Database
 	logger   *logging.Logger
+	timeout  time.Duration
 }
 
-func NewDatabase(logger *logging.Logger, config *config.Config) Storage {
+func NewDatabase(defaultLogger *logging.Logger, config *config.Config) Storage {
 	uri := config.GetString("database.uri")
 	name := config.GetString("database.name")
 	timeout := config.GetDuration("database.timeout")
 
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
+	logger := getLogger(defaultLogger, name, uri)
 
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
+	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
 	if err != nil {
-		logger.Fatal("Panic when connecting to database",
-			logging.String("name", name),
-			logging.String("timeout", timeout.String()),
-			logging.String("uri", uri))
+		logger.Error("Creating mongo client error")
 		panic(err)
 	}
 
@@ -41,6 +40,12 @@ func NewDatabase(logger *logging.Logger, config *config.Config) Storage {
 		client:   *client,
 		instance: instance,
 		logger:   logger,
+		timeout:  timeout,
+	}
+
+	err = db.Healthcheck()
+	if err != nil {
+		panic(err)
 	}
 
 	return db
@@ -100,7 +105,33 @@ func (db *Database) Bind(result *mongo.SingleResult, instance interface{}) error
 func (db *Database) Healthcheck() error {
 	err := db.client.Ping(context.Background(), &readpref.ReadPref{})
 	if err != nil {
-		return err
+		logErr := logging.String("error", err.Error())
+
+		if mongo.IsTimeout(err) {
+			timeoutField := logging.String("timeout", db.timeout.String())
+			db.logger.Error("Timeout error when ping to database", logErr, timeoutField)
+			return err
+
+		} else if mongo.IsNetworkError(err) {
+			db.logger.Error("Network error when ping to database", logErr)
+			return err
+
+		} else {
+			db.logger.Error("Unexpected error when ping to database", logErr)
+			return err
+		}
 	}
+
+	db.logger.Info("Succefully ping to database")
 	return nil
+}
+
+func getLogger(logger *logging.Logger, name string, uri string) *logging.Logger {
+	logFields := []logging.Field{
+		logging.String("name", name),
+		logging.String("uri", uri),
+		logging.String("package", "storages"),
+		logging.String("file", "db.go"),
+	}
+	return logger.With(logFields...)
 }

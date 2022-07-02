@@ -48,8 +48,12 @@ func NewLogger(config *config.Config) *Logger {
 	return logger
 }
 
-func (l *Logger) With(fields ...Field) {
-	l.l = l.l.With(fields...)
+func (l *Logger) With(fields ...Field) *Logger {
+	newLogger := l.l.With(fields...)
+	return &Logger{
+		l:     newLogger,
+		level: l.level,
+	}
 }
 
 func (l *Logger) Debug(msg string, fields ...Field) {
