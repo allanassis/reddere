@@ -48,7 +48,7 @@ func DeleteTemplate(service services.Service, storage storages.Storage, logger *
 	return func(c echo.Context) error {
 		templateId := c.Param("id")
 
-		err := service.Delete(templateId)
+		err := service.Delete(templateId, "template")
 		if err != nil {
 			panic(err)
 		}

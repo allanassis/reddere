@@ -1,8 +1,6 @@
 package services
 
 import (
-	"fmt"
-
 	"github.com/allanassis/reddere/src/observability/logging"
 	"github.com/allanassis/reddere/src/services/entities"
 	"github.com/allanassis/reddere/src/storages"
@@ -11,7 +9,7 @@ import (
 type Service interface {
 	Save(entity entities.Entity) (string, error)
 	Build(entity entities.Entity, entityID string) error
-	Delete(entityID string) error
+	Delete(entityID string, entityName string) error
 }
 
 type BaseService struct {
@@ -31,7 +29,6 @@ func (service *BaseService) Save(entity entities.Entity) (string, error) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Document inserted with id %s\n", id)
 	return id, nil
 }
 
@@ -41,16 +38,14 @@ func (service *BaseService) Build(entity entities.Entity, entityID string) error
 		panic(err)
 	}
 	service.storage.Bind(result, entity)
-	fmt.Printf("Document retrieved %+v\n", entity)
 	return nil
 }
 
-func (service *BaseService) Delete(entityID string) error {
-	_, err := service.storage.Delete(entityID, "template")
+func (service *BaseService) Delete(entityID string, entityName string) error {
+	_, err := service.storage.Delete(entityID, entityName)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Document Deleted %+v\n", entityID)
 	return nil
 }
 

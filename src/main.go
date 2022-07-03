@@ -9,7 +9,7 @@ import (
 	"github.com/allanassis/reddere/src/config"
 	"github.com/allanassis/reddere/src/observability/logging"
 	"github.com/allanassis/reddere/src/services"
-	"github.com/allanassis/reddere/src/storages"
+	"github.com/allanassis/reddere/src/storages/db"
 	"go.uber.org/fx"
 )
 
@@ -19,7 +19,7 @@ func main() {
 			services.NewService,
 			config.NewConfig,
 			logging.NewLogger,
-			storages.NewDatabase,
+			db.NewDatabase,
 		),
 		fx.Invoke(api.NewServer),
 	)
