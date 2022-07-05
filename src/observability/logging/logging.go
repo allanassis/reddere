@@ -29,6 +29,16 @@ func NewLogger(config *config.Config) *Logger {
 	level := getLevel(config)
 	writer := getWriter()
 
+	zapLogger := newZapLogger(level, writer)
+
+	logger := &Logger{
+		l:     zapLogger,
+		level: level,
+	}
+	return logger
+}
+
+func newZapLogger(level Level, writer io.Writer) *zap.Logger {
 	cfg := zap.NewProductionConfig()
 	cfg.EncoderConfig.TimeKey = "time"
 	cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
@@ -39,13 +49,7 @@ func NewLogger(config *config.Config) *Logger {
 		zapcore.Level(level),
 	)
 
-	zapLogger := zap.New(core)
-
-	logger := &Logger{
-		l:     zapLogger,
-		level: level,
-	}
-	return logger
+	return zap.New(core)
 }
 
 func (l *Logger) With(fields ...Field) *Logger {
@@ -54,6 +58,17 @@ func (l *Logger) With(fields ...Field) *Logger {
 		l:     newLogger,
 		level: l.level,
 	}
+}
+
+func (l *Logger) UpdateFiels(fields ...Field) {
+	l.l = l.l.With(fields...)
+}
+
+func (l *Logger) CleanUpFields() {
+	writer := getWriter()
+	zapLogger := newZapLogger(l.level, writer)
+
+	l.l = zapLogger
 }
 
 func (l *Logger) Debug(msg string, fields ...Field) {

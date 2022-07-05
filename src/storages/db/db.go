@@ -22,12 +22,10 @@ type Database struct {
 	timeout  time.Duration
 }
 
-func NewDatabase(defaultLogger *logging.Logger, config *config.Config) storages.Storage {
+func NewDatabase(logger *logging.Logger, config *config.Config) storages.Storage {
 	uri := config.GetString("database.uri")
 	name := config.GetString("database.name")
 	timeout := config.GetDuration("database.timeout")
-
-	logger := newLogger(defaultLogger, name, uri)
 
 	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
 
