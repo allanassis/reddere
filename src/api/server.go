@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/allanassis/reddere/src/api/handlers"
-	"github.com/allanassis/reddere/src/api/middlewares"
+	customMiddlewares "github.com/allanassis/reddere/src/api/middlewares"
 	"github.com/allanassis/reddere/src/config"
 	"github.com/allanassis/reddere/src/observability/logging"
 	"github.com/allanassis/reddere/src/services"
@@ -15,12 +15,11 @@ import (
 func NewServer(service services.Service, config *config.Config, db storages.Storage, logger *logging.Logger) {
 	e := echo.New()
 
-	e.Pre(middlewares.RequestLogger(logger))
-
-	// Middleware
+	// Middleware pre routes execution
+	e.Pre(customMiddlewares.RequestLogger(logger))
+	// Middleware pos routes execution
 	e.Use(middleware.Recover())
-	e.Use(middlewares.ResponseLogger(logger))
-
+	e.Use(customMiddlewares.ResponseLogger(logger))
 	e.GET("/healthcheck", handlers.Healthcheck(db, logger))
 
 	// Template
