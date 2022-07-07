@@ -20,7 +20,7 @@ func PostTemplate(service services.Service, storage storages.Storage, logger *lo
 			logger.Error("Error when binding payload",
 				append(loggingFields, logging.String("error", err.Error()))...,
 			)
-			c.JSON(
+			return c.JSON(
 				http.StatusUnprocessableEntity,
 				map[string]interface{}{"msg": "error when binding payload, you payload is invalid"},
 			)
@@ -33,7 +33,7 @@ func PostTemplate(service services.Service, storage storages.Storage, logger *lo
 			logger.Error("Internal Error when saving template",
 				append(loggingFields, logging.String("error", err.Error()))...,
 			)
-			c.JSON(
+			return c.JSON(
 				http.StatusInternalServerError,
 				map[string]interface{}{"msg": "Internal Error when saving template"},
 			)
@@ -58,7 +58,7 @@ func GetTemplate(service services.Service, storage storages.Storage, logger *log
 			logger.Error("Error when binding template",
 				append(loggingFields, logging.String("error", err.Error()))...,
 			)
-			c.JSON(
+			return c.JSON(
 				http.StatusInternalServerError,
 				map[string]interface{}{"msg": "error when binding template"},
 			)
@@ -81,7 +81,7 @@ func DeleteTemplate(service services.Service, storage storages.Storage, logger *
 			logger.Error("Error when binding template",
 				append(loggingFields, logging.String("error", err.Error()))...,
 			)
-			c.JSON(
+			return c.JSON(
 				http.StatusInternalServerError,
 				map[string]interface{}{"msg": "error when binding template"},
 			)
