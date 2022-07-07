@@ -27,7 +27,7 @@ func NewService(storage storages.Storage, logger *logging.Logger) Service {
 func (service *BaseService) Save(entity entities.Entity) (string, error) {
 	id, err := service.storage.Save(entity, entity.EntityName())
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 	return id, nil
 }
@@ -35,7 +35,7 @@ func (service *BaseService) Save(entity entities.Entity) (string, error) {
 func (service *BaseService) Build(entity entities.Entity, entityID string) error {
 	result, err := service.storage.Get(entityID, entity.EntityName())
 	if err != nil {
-		panic(err)
+		return err
 	}
 	service.storage.Bind(result, entity)
 	return nil
@@ -44,7 +44,7 @@ func (service *BaseService) Build(entity entities.Entity, entityID string) error
 func (service *BaseService) Delete(entityID string, entityName string) error {
 	_, err := service.storage.Delete(entityID, entityName)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	return nil
 }
