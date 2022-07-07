@@ -15,7 +15,7 @@ func (db DataBaseError) InternalError() error {
 
 type DbError string
 
-func newDbError(errCode DbError, err error) DataBaseError {
+func newDatabaseError(errCode DbError, err error) DataBaseError {
 	return DataBaseError{
 		Msg: errCode,
 		Err: err,
