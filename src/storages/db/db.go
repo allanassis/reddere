@@ -38,7 +38,7 @@ func NewDatabase(logger *logging.Logger, config *config.Config) storages.Storage
 		timeout:  timeout,
 	}
 	if err != nil {
-		panic(newDatabaseError(DB_CREATE_CLIENT_ERROR, err))
+		panic(err)
 	}
 
 	err = db.Healthcheck()
@@ -53,16 +53,16 @@ func (db *Database) Save(document interface{}, collectionName string) (string, e
 	collection := db.instance.Collection(collectionName)
 	logger := db.logger.With(logging.String("collection", collectionName))
 
-	logger.Debug("Retrive collection from database", logging.String("collection", collectionName))
+	logger.Debug("Retrive collection from database")
 
 	insertedResult, err := collection.InsertOne(context.Background(), document)
 	if err != nil {
-		return "", newDatabaseError(DB_INSER_ONE_ERROR, err)
+		return "", err
 	}
 
 	stringObjectID := insertedResult.InsertedID.(primitive.ObjectID).Hex()
 
-	logger.Debug("Succefully inserted document into database", logging.String("id", stringObjectID), logging.String("collection", collectionName))
+	logger.Debug("Succefully inserted document into database", logging.String("id", stringObjectID))
 	return stringObjectID, nil
 }
 
@@ -73,7 +73,7 @@ func (db *Database) Get(id string, collectionName string) (*mongo.SingleResult, 
 
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return nil, newDatabaseError(DB_INVALID_ID_ERROR, err)
+		return nil, err
 	}
 	logger.Debug("Succefully parsed id into object id")
 
@@ -84,7 +84,7 @@ func (db *Database) Get(id string, collectionName string) (*mongo.SingleResult, 
 	}
 
 	if result.Err() != nil {
-		return nil, newDatabaseError(DB_FIND_ONE_ERROR, err)
+		return nil, result.Err()
 	}
 
 	logger.Debug("Succefully found item in database", logging.String("id", id))
@@ -97,12 +97,12 @@ func (db *Database) Delete(id string, collectionName string) (*mongo.DeleteResul
 
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return nil, newDatabaseError(DB_INVALID_ID_ERROR, err)
+		return nil, err
 	}
 
 	result, err := collection.DeleteOne(context.Background(), bson.D{primitive.E{Key: "_id", Value: objectId}})
 	if err != nil {
-		return nil, newDatabaseError(DB_DELETE_ONE_ERROR, err)
+		return nil, err
 	}
 
 	logger.Debug("Succefully deleted item in database", logging.String("id", id))
@@ -117,7 +117,7 @@ func (db *Database) Bind(result *mongo.SingleResult, instance interface{}) error
 	}
 
 	if err != nil {
-		return newDatabaseError(DB_BIND_ERROR, err)
+		return err
 	}
 
 	db.logger.Debug("Succefully bind item", logging.Any("item", instance))
@@ -127,7 +127,7 @@ func (db *Database) Bind(result *mongo.SingleResult, instance interface{}) error
 func (db *Database) Healthcheck() error {
 	err := db.client.Ping(context.Background(), &readpref.ReadPref{})
 	if err != nil {
-		return newDatabaseError(DB_HEALTHCHECK_ERROR, err)
+		return err
 	}
 
 	db.logger.Info("Succefully ping to database")
