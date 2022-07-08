@@ -37,6 +37,11 @@ func (service *BaseService) Build(entity entities.Entity, entityID string) error
 	if err != nil {
 		return err
 	}
+
+	if result == nil {
+		return nil
+	}
+
 	service.storage.Bind(result, entity)
 	return nil
 }
