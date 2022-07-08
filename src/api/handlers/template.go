@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/allanassis/reddere/src/api/errors"
 	"github.com/allanassis/reddere/src/observability/logging"
 	"github.com/allanassis/reddere/src/services"
 	"github.com/allanassis/reddere/src/services/entities"
@@ -17,14 +18,14 @@ func PostTemplate(service services.Service, storage storages.Storage, logger *lo
 		loggingFields := []logging.Field{logging.String("entity", "Template")}
 		err := c.Bind(template)
 		if err != nil {
-			logger.Error(string(API_BIND_PAYLOAD_ERROR),
+			logger.Error(string(errors.API_BIND_PAYLOAD_ERROR),
 				append(loggingFields, logging.String("error", err.Error()))...,
 			)
 			return c.JSON(
 				http.StatusUnprocessableEntity,
 				map[string]string{
-					"errorCode": API_BIND_PAYLOAD_ERROR.String(),
-					"message":   string(API_BIND_PAYLOAD_ERROR),
+					"errorCode": errors.API_BIND_PAYLOAD_ERROR.String(),
+					"message":   string(errors.API_BIND_PAYLOAD_ERROR),
 					"eventID":   c.Get("eventID").(string),
 				})
 		}
@@ -33,14 +34,14 @@ func PostTemplate(service services.Service, storage storages.Storage, logger *lo
 
 		id, err := service.Save(template)
 		if err != nil {
-			logger.Error(string(API_POST_ERROR),
+			logger.Error(string(errors.API_POST_ERROR),
 				append(loggingFields, logging.String("error", err.Error()))...,
 			)
 			return c.JSON(
 				http.StatusInternalServerError,
 				map[string]string{
-					"errorCode": API_POST_ERROR.String(),
-					"message":   string(API_POST_ERROR),
+					"errorCode": errors.API_POST_ERROR.String(),
+					"message":   string(errors.API_POST_ERROR),
 					"eventID":   c.Get("eventID").(string),
 				})
 		}
@@ -61,14 +62,14 @@ func GetTemplate(service services.Service, storage storages.Storage, logger *log
 		templateId := c.Param("id")
 		err := service.Build(template, templateId)
 		if err != nil {
-			logger.Error(string(API_GET_ERROR),
+			logger.Error(string(errors.API_GET_ERROR),
 				append(loggingFields, logging.String("error", err.Error()))...,
 			)
 			return c.JSON(
 				http.StatusInternalServerError,
 				map[string]string{
-					"errorCode": API_GET_ERROR.String(),
-					"message":   string(API_GET_ERROR),
+					"errorCode": errors.API_GET_ERROR.String(),
+					"message":   string(errors.API_GET_ERROR),
 					"eventID":   c.Get("eventID").(string),
 				})
 		}
@@ -87,14 +88,14 @@ func DeleteTemplate(service services.Service, storage storages.Storage, logger *
 
 		err := service.Delete(templateId, "template")
 		if err != nil {
-			logger.Error(string(API_DELETE_ERROR),
+			logger.Error(string(errors.API_DELETE_ERROR),
 				append(loggingFields, logging.String("error", err.Error()))...,
 			)
 			return c.JSON(
 				http.StatusInternalServerError,
 				map[string]string{
-					"errorCode": API_DELETE_ERROR.String(),
-					"message":   string(API_DELETE_ERROR),
+					"errorCode": errors.API_DELETE_ERROR.String(),
+					"message":   string(errors.API_DELETE_ERROR),
 					"eventID":   c.Get("eventID").(string),
 				})
 		}

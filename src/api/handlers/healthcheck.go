@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/allanassis/reddere/src/api/errors"
 	"github.com/allanassis/reddere/src/observability/logging"
 	"github.com/allanassis/reddere/src/storages"
 	"github.com/labstack/echo/v4"
@@ -12,12 +13,12 @@ func Healthcheck(db storages.Storage, logger *logging.Logger) func(c echo.Contex
 	return func(c echo.Context) error {
 		err := db.Healthcheck()
 		if err != nil {
-			logger.Error(string(API_HEALTHCHECK_ERROR), logging.String("error", err.Error()))
+			logger.Error(string(errors.API_HEALTHCHECK_ERROR), logging.String("error", err.Error()))
 			return c.JSON(
 				http.StatusInternalServerError,
 				map[string]string{
-					"errorCode": API_HEALTHCHECK_ERROR.String(),
-					"message":   string(API_HEALTHCHECK_ERROR),
+					"errorCode": errors.API_HEALTHCHECK_ERROR.String(),
+					"message":   string(errors.API_HEALTHCHECK_ERROR),
 					"eventID":   c.Get("eventID").(string),
 				},
 			)
