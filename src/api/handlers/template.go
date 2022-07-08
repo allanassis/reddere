@@ -17,26 +17,32 @@ func PostTemplate(service services.Service, storage storages.Storage, logger *lo
 		loggingFields := []logging.Field{logging.String("entity", "Template")}
 		err := c.Bind(template)
 		if err != nil {
-			logger.Error("Error when binding payload",
+			logger.Error(string(API_BIND_PAYLOAD_ERROR),
 				append(loggingFields, logging.String("error", err.Error()))...,
 			)
 			return c.JSON(
 				http.StatusUnprocessableEntity,
-				map[string]interface{}{"msg": "error when binding payload, you payload is invalid"},
-			)
+				map[string]string{
+					"errorCode": API_BIND_PAYLOAD_ERROR.String(),
+					"message":   string(API_BIND_PAYLOAD_ERROR),
+					"eventID":   c.Get("eventID").(string),
+				})
 		}
 		loggingFields = append(loggingFields, logging.Any("template", template))
 		logger.Debug("Received request with payload", loggingFields...)
 
 		id, err := service.Save(template)
 		if err != nil {
-			logger.Error("Internal Error when saving template",
+			logger.Error(string(API_POST_ERROR),
 				append(loggingFields, logging.String("error", err.Error()))...,
 			)
 			return c.JSON(
 				http.StatusInternalServerError,
-				map[string]interface{}{"msg": "Internal Error when saving template"},
-			)
+				map[string]string{
+					"errorCode": API_POST_ERROR.String(),
+					"message":   string(API_POST_ERROR),
+					"eventID":   c.Get("eventID").(string),
+				})
 		}
 		logger.Info("Succefuly saved template", append(loggingFields, logging.String("id", id))...)
 
@@ -55,13 +61,16 @@ func GetTemplate(service services.Service, storage storages.Storage, logger *log
 		templateId := c.Param("id")
 		err := service.Build(template, templateId)
 		if err != nil {
-			logger.Error("Error when binding template",
+			logger.Error(string(API_GET_ERROR),
 				append(loggingFields, logging.String("error", err.Error()))...,
 			)
 			return c.JSON(
 				http.StatusInternalServerError,
-				map[string]interface{}{"msg": "error when binding template"},
-			)
+				map[string]string{
+					"errorCode": API_GET_ERROR.String(),
+					"message":   string(API_GET_ERROR),
+					"eventID":   c.Get("eventID").(string),
+				})
 		}
 		loggingFields = append(loggingFields, logging.Any("template", template))
 		logger.Info("Succefuly get template", append(loggingFields, logging.String("id", templateId))...)
@@ -78,13 +87,16 @@ func DeleteTemplate(service services.Service, storage storages.Storage, logger *
 
 		err := service.Delete(templateId, "template")
 		if err != nil {
-			logger.Error("Error when binding template",
+			logger.Error(string(API_DELETE_ERROR),
 				append(loggingFields, logging.String("error", err.Error()))...,
 			)
 			return c.JSON(
 				http.StatusInternalServerError,
-				map[string]interface{}{"msg": "error when binding template"},
-			)
+				map[string]string{
+					"errorCode": API_DELETE_ERROR.String(),
+					"message":   string(API_DELETE_ERROR),
+					"eventID":   c.Get("eventID").(string),
+				})
 		}
 		logger.Info("Succefuly deleted template", append(loggingFields, logging.String("id", templateId))...)
 

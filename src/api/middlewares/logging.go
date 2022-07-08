@@ -12,6 +12,8 @@ func RequestLogger(logger *logging.Logger) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(ctx echo.Context) error {
 			eventID, err := uuid.NewRandom()
+			ctx.Set("eventID", eventID.String())
+
 			if err != nil {
 				panic(err)
 			}

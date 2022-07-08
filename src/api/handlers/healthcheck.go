@@ -12,8 +12,16 @@ func Healthcheck(db storages.Storage, logger *logging.Logger) func(c echo.Contex
 	return func(c echo.Context) error {
 		err := db.Healthcheck()
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+			logger.Error(string(API_HEALTHCHECK_ERROR), logging.String("error", err.Error()))
+			return c.JSON(
+				http.StatusInternalServerError,
+				map[string]string{
+					"errorCode": API_HEALTHCHECK_ERROR.String(),
+					"message":   string(API_HEALTHCHECK_ERROR),
+					"eventID":   c.Get("eventID").(string),
+				},
+			)
 		}
-		return c.JSON(http.StatusOK, map[string]string{"message": "Working"})
+		return c.JSON(http.StatusOK, map[string]string{"message": "Working", "eventID": c.Get("eventID").(string)})
 	}
 }
