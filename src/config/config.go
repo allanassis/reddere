@@ -22,7 +22,10 @@ func NewConfig() *Config {
 	config.SetConfigType("yml")
 	config.SetConfigName(fmt.Sprintf("%s.yml", env))
 	config.SetEnvPrefix("PREFIX")
-	config.ReadInConfig()
+	err := config.ReadInConfig()
+	if err != nil {
+		panic(err)
+	}
 	config.AutomaticEnv()
 	config.WatchConfig()
 

@@ -42,7 +42,11 @@ func (service *BaseService) Build(entity entities.Entity, entityID string) error
 		return nil
 	}
 
-	service.storage.Bind(result, entity)
+	err = service.storage.Bind(result, entity)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

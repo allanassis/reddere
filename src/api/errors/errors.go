@@ -1,7 +1,5 @@
 package errors
 
-import "fmt"
-
 type ApiError string
 
 func (e ApiError) String() string {
@@ -17,7 +15,7 @@ func (e ApiError) String() string {
 	case API_POST_ERROR:
 		return "API_POST_ERROR"
 	default:
-		return fmt.Sprintf("%s", string(e))
+		return string(e)
 	}
 }
 
