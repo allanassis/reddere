@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/allanassis/reddere/src/api/errors"
+	"github.com/allanassis/reddere/src/api/response"
 	"github.com/allanassis/reddere/src/observability/logging"
 	"github.com/allanassis/reddere/src/services"
 	"github.com/allanassis/reddere/src/services/entities"
@@ -18,17 +19,19 @@ func PostTemplate(service services.Service, storage storages.Storage, logger *lo
 		loggingFields := []logging.Field{logging.String("entity", "Template")}
 		err := c.Bind(template)
 		if err != nil {
+
 			logger.Error(string(errors.API_BIND_PAYLOAD_ERROR),
 				append(loggingFields, logging.String("error", err.Error()))...,
 			)
-			return c.JSON(
-				http.StatusUnprocessableEntity,
-				map[string]string{
-					"errorCode": errors.API_BIND_PAYLOAD_ERROR.String(),
-					"message":   string(errors.API_BIND_PAYLOAD_ERROR),
-					"eventID":   c.Get("eventID").(string),
-				})
+
+			resp := response.NewApiResponse(
+				response.WithEventID(c.Get("eventID").(string)),
+				response.WithError(errors.API_BIND_PAYLOAD_ERROR),
+			)
+
+			return c.JSON(http.StatusUnprocessableEntity, resp)
 		}
+
 		loggingFields = append(loggingFields, logging.Any("template", template))
 		logger.Debug("Received request with payload", loggingFields...)
 
@@ -37,19 +40,24 @@ func PostTemplate(service services.Service, storage storages.Storage, logger *lo
 			logger.Error(string(errors.API_POST_ERROR),
 				append(loggingFields, logging.String("error", err.Error()))...,
 			)
-			return c.JSON(
-				http.StatusInternalServerError,
-				map[string]string{
-					"errorCode": errors.API_POST_ERROR.String(),
-					"message":   string(errors.API_POST_ERROR),
-					"eventID":   c.Get("eventID").(string),
-				})
+
+			resp := response.NewApiResponse(
+				response.WithEventID(c.Get("eventID").(string)),
+				response.WithError(errors.API_POST_ERROR),
+			)
+
+			return c.JSON(http.StatusInternalServerError, resp)
 		}
 		logger.Info("Succefuly saved template", append(loggingFields, logging.String("id", id))...)
 
 		template.ID = id
 
-		return c.JSON(http.StatusCreated, template)
+		resp := response.NewApiResponse(
+			response.WithEventID(c.Get("eventID").(string)),
+			response.WithMessage("Succefuly saved template"),
+			response.WithData(template),
+		)
+		return c.JSON(http.StatusCreated, resp)
 	}
 }
 
@@ -65,18 +73,23 @@ func GetTemplate(service services.Service, storage storages.Storage, logger *log
 			logger.Error(string(errors.API_GET_ERROR),
 				append(loggingFields, logging.String("error", err.Error()))...,
 			)
-			return c.JSON(
-				http.StatusInternalServerError,
-				map[string]string{
-					"errorCode": errors.API_GET_ERROR.String(),
-					"message":   string(errors.API_GET_ERROR),
-					"eventID":   c.Get("eventID").(string),
-				})
+			resp := response.NewApiResponse(
+				response.WithEventID(c.Get("eventID").(string)),
+				response.WithError(errors.API_GET_ERROR),
+			)
+
+			return c.JSON(http.StatusInternalServerError, resp)
 		}
 		loggingFields = append(loggingFields, logging.Any("template", template))
 		logger.Info("Succefuly get template", append(loggingFields, logging.String("id", templateId))...)
 
-		return c.JSON(http.StatusOK, template)
+		resp := response.NewApiResponse(
+			response.WithEventID(c.Get("eventID").(string)),
+			response.WithMessage("Succefuly get template"),
+			response.WithData(template),
+		)
+
+		return c.JSON(http.StatusOK, resp)
 	}
 }
 
@@ -91,16 +104,26 @@ func DeleteTemplate(service services.Service, storage storages.Storage, logger *
 			logger.Error(string(errors.API_DELETE_ERROR),
 				append(loggingFields, logging.String("error", err.Error()))...,
 			)
-			return c.JSON(
-				http.StatusInternalServerError,
-				map[string]string{
-					"errorCode": errors.API_DELETE_ERROR.String(),
-					"message":   string(errors.API_DELETE_ERROR),
-					"eventID":   c.Get("eventID").(string),
-				})
+
+			resp := response.NewApiResponse(
+				response.WithEventID(c.Get("eventID").(string)),
+				response.WithError(errors.API_DELETE_ERROR),
+			)
+
+			return c.JSON(http.StatusInternalServerError, resp)
 		}
 		logger.Info("Succefuly deleted template", append(loggingFields, logging.String("id", templateId))...)
 
-		return c.JSON(http.StatusOK, templateId)
+		template := &entities.Template{
+			ID: templateId,
+		}
+
+		resp := response.NewApiResponse(
+			response.WithEventID(c.Get("eventID").(string)),
+			response.WithMessage("Succefuly deleted template"),
+			response.WithData(template),
+		)
+
+		return c.JSON(http.StatusOK, resp)
 	}
 }
