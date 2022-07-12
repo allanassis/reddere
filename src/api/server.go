@@ -8,10 +8,21 @@ import (
 	"github.com/allanassis/reddere/src/services"
 	"github.com/allanassis/reddere/src/storages"
 
+	_ "github.com/allanassis/reddere/docs"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
+// @title Reddere
+// @version 1.0
+// @description This is a simple server to save templates.
+
+// @contact.name Allan Assis de Andrade
+
+// @license.name MIT License
+
+// @BasePath /
 func NewServer(service services.Service, config *config.Config, db storages.Storage, logger *logging.Logger) {
 	e := echo.New()
 
@@ -20,6 +31,8 @@ func NewServer(service services.Service, config *config.Config, db storages.Stor
 	// Middleware pos routes execution
 	e.Use(middleware.Recover())
 	e.Use(customMiddlewares.ResponseLogger(logger))
+
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
 	e.GET("/healthcheck", handlers.Healthcheck(db, logger))
 
 	// Template

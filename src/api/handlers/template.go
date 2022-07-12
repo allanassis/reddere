@@ -12,6 +12,18 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// ShowAccount godoc
+// @Summary      Save a template
+// @Description  post template
+// @Tags         template
+// @Accept       json
+// @Produce      json
+// @Param        template  body     entities.Template   true  "Template"
+// @Success      200  {object}  response.ApiResponse
+// @Failure      400  {object}  response.ApiResponse
+// @Failure      404  {object}  response.ApiResponse
+// @Failure      500  {object}  response.ApiResponse
+// @Router       /template [post]
 func PostTemplate(service services.Service, storage storages.Storage, logger *logging.Logger) func(c echo.Context) error {
 	return func(c echo.Context) error {
 		template := new(entities.Template)
@@ -61,6 +73,18 @@ func PostTemplate(service services.Service, storage storages.Storage, logger *lo
 	}
 }
 
+// ShowTemplate godoc
+// @Summary      Show a template
+// @Description  get template by ID
+// @Tags         template
+// @Accept       json
+// @Produce      json
+// @Param        id   path      string  true  "Template ID"
+// @Success      200  {object}  response.ApiResponse
+// @Failure      400  {object}  response.ApiResponse
+// @Failure      404  {object}  response.ApiResponse
+// @Failure      500  {object}  response.ApiResponse
+// @Router       /template/{id} [get]
 func GetTemplate(service services.Service, storage storages.Storage, logger *logging.Logger) func(c echo.Context) error {
 	return func(c echo.Context) error {
 		template := new(entities.Template)
@@ -93,6 +117,18 @@ func GetTemplate(service services.Service, storage storages.Storage, logger *log
 	}
 }
 
+// DeleteTemplate godoc
+// @Summary      Delete a template
+// @Description  delete template by ID
+// @Tags         template
+// @Accept       json
+// @Produce      json
+// @Param        id   path      string  true  "Template ID"
+// @Success      200  {object}  response.ApiResponse
+// @Failure      400  {object}  response.ApiResponse
+// @Failure      404  {object}  response.ApiResponse
+// @Failure      500  {object}  response.ApiResponse
+// @Router       /template/{id} [delete]
 func DeleteTemplate(service services.Service, storage storages.Storage, logger *logging.Logger) func(c echo.Context) error {
 	return func(c echo.Context) error {
 		loggingFields := []logging.Field{logging.String("entity", "Template")}

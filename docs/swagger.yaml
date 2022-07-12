@@ -1,0 +1,129 @@
+definitions:
+  entities.Template:
+    properties:
+      _id:
+        type: string
+      name:
+        type: string
+      url:
+        type: string
+    type: object
+  response.ApiResponse:
+    properties:
+      data: {}
+      errorCode:
+        type: string
+      eventId:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    required:
+    - eventId
+    - message
+    - status
+    type: object
+info:
+  contact: {}
+paths:
+  /template:
+    post:
+      consumes:
+      - application/json
+      description: post template
+      parameters:
+      - description: Template
+        in: body
+        name: template
+        required: true
+        schema:
+          $ref: '#/definitions/entities.Template'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ApiResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ApiResponse'
+      summary: Save a template
+      tags:
+      - template
+  /template/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete template by ID
+      parameters:
+      - description: Template ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ApiResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ApiResponse'
+      summary: Delete a template
+      tags:
+      - template
+    get:
+      consumes:
+      - application/json
+      description: get template by ID
+      parameters:
+      - description: Template ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ApiResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ApiResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ApiResponse'
+      summary: Show an template
+      tags:
+      - template
+swagger: "2.0"
