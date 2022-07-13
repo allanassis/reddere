@@ -17,17 +17,15 @@ import (
 // @title Reddere
 // @version 1.0
 // @description This is a simple server to save templates.
-
 // @contact.name Allan Assis de Andrade
-
 // @license.name MIT License
-
 // @BasePath /
 func NewServer(service services.Service, config *config.Config, db storages.Storage, logger *logging.Logger) {
 	e := echo.New()
 
 	// Middleware pre routes execution
 	e.Pre(customMiddlewares.RequestLogger(logger))
+
 	// Middleware pos routes execution
 	e.Use(middleware.Recover())
 	e.Use(customMiddlewares.ResponseLogger(logger))

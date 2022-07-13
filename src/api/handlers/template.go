@@ -43,9 +43,25 @@ func PostTemplate(service services.Service, storage storages.Storage, logger *lo
 
 			return c.JSON(http.StatusUnprocessableEntity, resp)
 		}
-
 		loggingFields = append(loggingFields, logging.Any("template", template))
 		logger.Debug("Received request with payload", loggingFields...)
+
+		isValid, err := template.IsValid()
+		if !isValid {
+
+			logger.Error(string(errors.API_BIND_PAYLOAD_ERROR),
+				append(loggingFields, logging.String("error", err.Error()))...,
+			)
+
+			resp := response.NewApiResponse(
+				response.WithEventID(c.Get("eventID").(string)),
+				response.WithError(errors.API_BIND_PAYLOAD_ERROR),
+				response.WithData(err),
+			)
+
+			return c.JSON(http.StatusBadRequest, resp)
+		}
+		logger.Debug("Fields succefuly validated", loggingFields...)
 
 		id, err := service.Save(template)
 		if err != nil {
